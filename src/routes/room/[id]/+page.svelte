@@ -1159,7 +1159,7 @@
 								placeholder="홍길동"
 								class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-slate-500 focus:border-transparent"
 								style="font-size: 16px;"
-								on:keypress={(e) => e.key === 'Enter' && joinRoom()}
+								onkeypress={(e) => e.key === 'Enter' && joinRoom()}
 							/>
 						</div>
 						
@@ -1230,7 +1230,7 @@
 				<!-- Participants Toggle Button -->
 				<button 
 					class="absolute -right-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-r-lg p-3 cursor-pointer shadow-lg"
-					on:click={() => participantsExpanded = !participantsExpanded}
+					onclick={() => participantsExpanded = !participantsExpanded}
 					aria-label="참여자 패널 토글"
 				>
 					<div class="flex flex-col items-center gap-1">
@@ -1334,7 +1334,7 @@
 				<!-- Chat Header (Always Visible) -->
 				<button 
 					class="w-full p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 cursor-pointer flex items-center justify-between rounded-t-lg"
-					on:click={() => chatExpanded = !chatExpanded}
+					onclick={() => chatExpanded = !chatExpanded}
 					aria-label="채팅창 토글"
 				>
 					<div class="flex items-center gap-2">
@@ -1380,7 +1380,7 @@
 									placeholder="메시지를 입력하세요..."
 									class="flex-1 px-3 py-2 text-base border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-slate-500 focus:border-transparent"
 									style="font-size: 16px;"
-									on:keypress={(e) => e.key === 'Enter' && sendMessage()}
+									onkeypress={(e) => e.key === 'Enter' && sendMessage()}
 								/>
 								<Button 
 									size="sm" 
@@ -1408,7 +1408,7 @@
 								</h3>
 								<button 
 									class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-									on:click={() => showDestinationSearch = false}
+									onclick={() => showDestinationSearch = false}
 									aria-label="검색창 닫기"
 								>
 									<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1448,7 +1448,7 @@
 									{#each searchResults as place (place.id)}
 										<button
 											class="w-full p-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0"
-											on:click={() => moveToLocation(place)}
+											onclick={() => moveToLocation(place)}
 										>
 											<div class="flex items-start gap-3">
 												<div class="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
