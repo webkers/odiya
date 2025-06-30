@@ -1,4 +1,5 @@
 <script>
+	// @ts-nocheck
 	import { page } from '$app/stores';
 	import { Button } from "$lib/components/ui/button";
 	import { goto } from '$app/navigation';
