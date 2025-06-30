@@ -9,6 +9,7 @@
 	let roomId = $page.params.id;
 	let displayName = '';
 	let joined = false;
+	let roomNotFound = false;
 	/** @type {Array<{id: string, name: string, location_lat?: number, location_lng?: number, is_creator: boolean}>} */
 	let participants = [];
 	/** @type {Array<{sender: string, content: string, created_at: string}>} */
@@ -321,6 +322,14 @@
 		console.log('=== onMount 시작 - 방장 확인 ===');
 		console.log('roomId:', roomId);
 		
+		// Validate roomId format (6 alphanumeric characters)
+		const roomIdPattern = /^[A-Z0-9]{6}$/;
+		if (!roomIdPattern.test(roomId)) {
+			console.log('Invalid roomId format:', roomId);
+			roomNotFound = true;
+			return;
+		}
+		
 		const creatorId = localStorage.getItem(`room_${roomId}_creator`);
 		console.log('localStorage에서 가져온 creatorId:', creatorId);
 		
@@ -445,6 +454,28 @@
 
 	async function loadRoomData() {
 		if (!supabase) return;
+
+		// Check if room exists first
+		const { data: roomExists, error: roomError } = await supabase
+			.from('rooms')
+			.select('id')
+			.eq('id', roomId)
+			.single();
+
+		if (roomError || !roomExists) {
+			// Room doesn't exist, check if there are any participants
+			const { data: participantsCheck } = await supabase
+				.from('participants')
+				.select('id')
+				.eq('room_id', roomId)
+				.limit(1);
+			
+			if (!participantsCheck || participantsCheck.length === 0) {
+				// No room and no participants - room not found
+				roomNotFound = true;
+				return;
+			}
+		}
 
 		// Load participants
 		const { data: participantsData } = await supabase
@@ -1030,6 +1061,16 @@
 		goto('/');
 	}
 
+	// 홈으로 이동 함수 (헤더 로고 클릭 시)
+	async function goToHome() {
+		if (joined) {
+			// 참여 중인 경우에만 cleanup 실행
+			await leaveRoomCleanup();
+			localStorage.removeItem(`room_${roomId}_user`);
+		}
+		goto('/');
+	}
+
 	function openDestinationSearch() {
 		console.log('=== 목적지 검색 시작 ===');
 		console.log('isCreator:', isCreator);
@@ -1054,7 +1095,44 @@
 </svelte:head>
 
 <main class="min-h-screen bg-slate-50 dark:bg-slate-900">
-	{#if !joined}
+	{#if roomNotFound}
+		<!-- Room Not Found -->
+		<div class="min-h-screen flex items-center justify-center px-4">
+			<div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-md text-center">
+				<div class="space-y-6">
+					<!-- Error Icon -->
+					<div class="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto">
+						<svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+						</svg>
+					</div>
+					
+					<!-- Error Message -->
+					<div>
+						<h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+							룸을 찾을 수 없습니다
+						</h1>
+						<p class="text-slate-600 dark:text-slate-400">
+							룸 ID: <span class="font-mono text-sm bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">{roomId}</span>
+						</p>
+						<p class="text-slate-600 dark:text-slate-400 mt-2">
+							존재하지 않거나 만료된 룸입니다.
+						</p>
+					</div>
+					
+					<!-- Home Button -->
+					<div>
+						<Button 
+							class="w-full"
+							onclick={() => goto('/')}
+						>
+							🏠 홈으로 이동
+						</Button>
+					</div>
+				</div>
+			</div>
+		</div>
+	{:else if !joined}
 		<!-- Join Room Modal -->
 		<div class="min-h-screen flex items-center justify-center px-4">
 			<div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-md">
@@ -1112,9 +1190,12 @@
 			<header class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 pt-[calc(env(safe-area-inset-top)+1rem)]">
 				<div class="flex items-center justify-between">
 					<div>
-						<h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
+						<button 
+							class="text-xl font-semibold text-slate-900 dark:text-slate-100 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+							onclick={goToHome}
+						>
 							오디야
-						</h1>
+						</button>
 					</div>
 					<div class="flex gap-2">
 						<div class="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -1144,10 +1225,10 @@
 			</div>
 
 			<!-- Floating Participants Panel -->
-			<div class="fixed top-[calc(5rem+env(safe-area-inset-top))] left-0 z-40 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-lg transition-transform duration-300 ease-in-out {participantsExpanded ? 'translate-x-0' : 'translate-x-[-280px]'}">
+			<div class="fixed top-[65px] left-0 z-40 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-lg transition-transform duration-300 ease-in-out {participantsExpanded ? 'translate-x-0' : 'translate-x-[-280px]'}">
 				<!-- Participants Toggle Button -->
 				<button 
-					class="absolute -right-12 top-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-r-lg p-3 cursor-pointer shadow-lg"
+					class="absolute -right-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-r-lg p-3 cursor-pointer shadow-lg"
 					on:click={() => participantsExpanded = !participantsExpanded}
 					aria-label="참여자 패널 토글"
 				>
