@@ -21,6 +21,9 @@
 	let tempMarker = null;
 	let longPressTimer = null;
 	let isLongPress = false;
+	let isFirstLoad = true;
+	let lastParticipantCount = 0;
+	let lastDestination = null;
 
 	// Kakao Maps API 로드
 	function loadKakaoMapsAPI() {
@@ -433,8 +436,14 @@
 			});
 		}
 
-		// 모든 마커가 보이도록 지도 범위 조정
-		if (markers.length > 0 || destinationMarker) {
+		// 지도 범위 조정이 필요한 경우만 실행
+		const currentParticipantCount = participants.filter(p => p.location_lat && p.location_lng).length;
+		const destinationChanged = JSON.stringify(destination) !== JSON.stringify(lastDestination);
+		const newParticipants = currentParticipantCount > lastParticipantCount;
+		
+		const shouldAdjustBounds = isFirstLoad || destinationChanged || newParticipants;
+		
+		if (shouldAdjustBounds && (markers.length > 0 || destinationMarker)) {
 			// @ts-ignore
 			const bounds = new window.kakao.maps.LatLngBounds();
 			let hasLocations = false;
@@ -459,6 +468,9 @@
 					// @ts-ignore
 					map.setCenter(new window.kakao.maps.LatLng(destination.lat, destination.lng));
 					map.setLevel(3); // 적당한 확대 레벨
+					isFirstLoad = false;
+					lastParticipantCount = currentParticipantCount;
+					lastDestination = destination ? { ...destination } : null;
 					return;
 				}
 			}
@@ -468,6 +480,11 @@
 				map.setBounds(bounds, 50, 50, 50, 50);
 			}
 		}
+		
+		// 상태 업데이트
+		isFirstLoad = false;
+		lastParticipantCount = currentParticipantCount;
+		lastDestination = destination ? { ...destination } : null;
 	}
 
 	onMount(() => {
