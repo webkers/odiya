@@ -1108,7 +1108,7 @@
 		<!-- Room Interface -->
 		<div class="flex flex-col h-screen">
 			<!-- Header -->
-			<header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4">
+			<header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 pt-[calc(env(safe-area-inset-top)+1rem)]">
 				<div class="flex items-center justify-between">
 					<div>
 						<h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
@@ -1143,7 +1143,7 @@
 			</div>
 
 			<!-- Floating Participants Panel -->
-			<div class="fixed top-16 left-0 z-40 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-lg transition-transform duration-300 ease-in-out {participantsExpanded ? 'translate-x-0' : 'translate-x-[-280px]'}">
+			<div class="fixed top-[calc(5rem+env(safe-area-inset-top))] left-0 z-40 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-lg transition-transform duration-300 ease-in-out {participantsExpanded ? 'translate-x-0' : 'translate-x-[-280px]'}">
 				<!-- Participants Toggle Button -->
 				<button 
 					class="absolute -right-12 top-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-r-lg p-3 cursor-pointer shadow-lg"
@@ -1163,7 +1163,7 @@
 				</button>
 
 				<!-- Participants Content -->
-				<div class="w-80 h-[calc(100vh-80px)] p-4 overflow-y-auto">
+				<div class="w-80 h-[calc(100vh-5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] p-4 overflow-y-auto">
 					<div class="space-y-4">
 						<div>
 							<h2 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-3">
