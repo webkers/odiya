@@ -1079,6 +1079,7 @@
 								bind:value={displayName}
 								placeholder="홍길동"
 								class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+								style="font-size: 16px;"
 								on:keypress={(e) => e.key === 'Enter' && joinRoom()}
 							/>
 						</div>
@@ -1106,9 +1107,9 @@
 		</div>
 	{:else}
 		<!-- Room Interface -->
-		<div class="flex flex-col h-screen">
-			<!-- Header -->
-			<header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 pt-[calc(env(safe-area-inset-top)+1rem)]">
+		<div class="h-screen">
+			<!-- Fixed Header -->
+			<header class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 pt-[calc(env(safe-area-inset-top)+1rem)]">
 				<div class="flex items-center justify-between">
 					<div>
 						<h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
@@ -1138,7 +1139,7 @@
 			</header>
 
 			<!-- Map Panel (Full Screen) -->
-			<div class="flex-1 relative">
+			<div class="absolute inset-0 pt-[calc(5rem+env(safe-area-inset-top))]">
 				<KakaoMap {participants} {destination} {isCreator} />
 			</div>
 
@@ -1295,7 +1296,8 @@
 									type="text"
 									bind:value={newMessage}
 									placeholder="메시지를 입력하세요..."
-									class="flex-1 px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+									class="flex-1 px-3 py-2 text-base border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+									style="font-size: 16px;"
 									on:keypress={(e) => e.key === 'Enter' && sendMessage()}
 								/>
 								<Button 
@@ -1340,6 +1342,7 @@
 									bind:value={searchQuery}
 									placeholder="장소명이나 주소를 입력하세요"
 									class="w-full px-4 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									style="font-size: 16px;"
 									autocomplete="off"
 								/>
 								{#if isSearching}
