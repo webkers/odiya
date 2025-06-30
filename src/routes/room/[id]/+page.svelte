@@ -456,25 +456,28 @@
 	async function loadRoomData() {
 		if (!supabase) return;
 
-		// Check if room exists first
-		const { data: roomExists, error: roomError } = await supabase
-			.from('rooms')
-			.select('id')
-			.eq('id', roomId)
-			.single();
-
-		if (roomError || !roomExists) {
-			// Room doesn't exist, check if there are any participants
-			const { data: participantsCheck } = await supabase
-				.from('participants')
+		// Skip room existence check if user is the creator (they're creating the room)
+		if (!isCreator) {
+			// Check if room exists first
+			const { data: roomExists, error: roomError } = await supabase
+				.from('rooms')
 				.select('id')
-				.eq('room_id', roomId)
-				.limit(1);
-			
-			if (!participantsCheck || participantsCheck.length === 0) {
-				// No room and no participants - room not found
-				roomNotFound = true;
-				return;
+				.eq('id', roomId)
+				.single();
+
+			if (roomError || !roomExists) {
+				// Room doesn't exist, check if there are any participants
+				const { data: participantsCheck } = await supabase
+					.from('participants')
+					.select('id')
+					.eq('room_id', roomId)
+					.limit(1);
+				
+				if (!participantsCheck || participantsCheck.length === 0) {
+					// No room and no participants - room not found
+					roomNotFound = true;
+					return;
+				}
 			}
 		}
 
@@ -1221,7 +1224,7 @@
 			</header>
 
 			<!-- Map Panel (Full Screen) -->
-			<div class="absolute inset-0 pt-[calc(5rem+env(safe-area-inset-top))]">
+			<div class="absolute inset-0">
 				<KakaoMap {participants} {destination} {isCreator} />
 			</div>
 
